@@ -1,0 +1,95 @@
+target: all
+
+auth_enabled: false
+
+server:
+  grpc_server_max_send_msg_size: 536870912
+
+distributor:
+  shard_by_all_labels: true
+  zone_results_quorum_metadata: true
+  pool:
+    health_check_ingesters: true
+
+ingester_client:
+  grpc_client_config:
+    # Configure the client to allow messages up to 100MB.
+    max_recv_msg_size: 104857600
+    max_send_msg_size: 104857600
+    grpc_compression: gzip
+
+ingester:
+  lifecycler:
+    # We want to start immediately.
+    join_after: 0
+    final_sleep: 0s
+    num_tokens: 512
+    address: 127.0.0.1
+
+    ring:
+      replication_factor: 1
+
+querier:
+  query_ingesters_within: 3h
+  # per_step_stats_enabled: true
+  query_store_for_labels_enabled: true
+  ingester_streaming: true
+  ingester_metadata_streaming: true
+
+query_range:
+  align_queries_with_step: true
+  cache_results: true
+  split_queries_by_interval: 24h0m0s
+
+blocks_storage:
+  backend: s3
+
+  tsdb:
+    block_ranges_period: ["5m", "15m"]
+    dir: /tmp/cortex-tsdb-ingester
+    ship_interval: 1m
+    retention_period: 3h
+    enable_native_histograms: true
+
+  bucket_store:
+    sync_dir: /tmp/cortex-tsdb-querier
+    consistency_delay: 5s
+    bucket_index:
+      enabled: false
+    index_cache:
+      backend: inmemory
+
+  s3:
+    endpoint:          minio:9000
+    bucket_name:       cortex
+    access_key_id:     cortex
+    secret_access_key: supersecret
+    insecure:          true
+
+storage:
+  engine: blocks
+
+store_gateway:
+  sharding_enabled: false
+  sharding_ring:
+    replication_factor: 1
+    heartbeat_period:   5s
+    heartbeat_timeout:  15s
+
+runtime_config:
+  filesystem:
+    dir: /cortex/config/
+  file: runtime.yaml
+
+limits: {}
+
+frontend:
+  query_stats_enabled: true
+  max_outstanding_per_tenant: 1000
+
+frontend_worker: {}
+
+query_scheduler: {}
+
+api:
+  response_compression_enabled: true

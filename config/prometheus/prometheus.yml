@@ -1,0 +1,20 @@
+# my global config
+global:
+  scrape_interval: 5s
+
+remote_write:
+  - url: http://cortex/api/v1/push
+    send_exemplars: false
+    send_native_histograms: true
+    #headers:
+      #X-Scope-OrgID: user1
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  - job_name: "app"
+    static_configs:
+    - targets: ["app:18080"]
+  - job_name: "prometheus"
+    static_configs:
+    - targets: ["localhost:9090"]

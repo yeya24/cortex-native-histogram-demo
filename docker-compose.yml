@@ -1,0 +1,70 @@
+version: '3.4'
+services:
+  consul:
+    image: hashicorp/consul:1.15.4
+    command: [ "agent", "-dev" ,"-client=0.0.0.0", "-log-level=info" ]
+    ports:
+      - 8500:8500
+
+  minio:
+    image: minio/minio
+    entrypoint: [""]
+    command: ["sh", "-c", "mkdir -p /data/cortex && minio server /data --console-address=:9002"]
+    environment:
+      - MINIO_ROOT_USER=cortex
+      - MINIO_ROOT_PASSWORD=supersecret
+    ports:
+      - 9000:9000
+      - 9002:9002
+    volumes:
+      - ./data/minio:/data
+
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    command: ["--config.file=/etc/prometheus/prometheus.yaml",  "--enable-feature=native-histograms", "--enable-feature=expand-external-labels", "--enable-feature=agent"]
+    environment:
+      PODNAME: prometheus
+    volumes:
+      - ./config/prometheus:/etc/prometheus
+      - data-prometheus:/prometheus
+    ports:
+      - 9090:9090
+
+  grafana:
+    image: grafana/grafana:10.1.15
+    pull_policy: always
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_USERS_DEFAULT_THEME=light
+      - GF_LOG_MODE=console
+      - GF_LOG_LEVEL=critical
+    volumes:
+      - ./config/grafana/provisioning-datasources.yaml:/etc/grafana/provisioning/datasources/provisioning-datasources.yaml:ro
+    ports:
+      - 3000:3000
+
+  cortex:
+    image: yeya24/cortex:native-histogram-demo
+    hostname: cortex
+    depends_on:
+      - minio
+      - consul
+    command: ["-config.file=/cortex/config/cortex.yaml", "-server.http-listen-port=8080", "-server.grpc-listen-port=9080"]
+    ports:
+      - 8080:8080
+    volumes:
+      - ./config/cortex:/cortex/config
+      - ./data/data-cortex:/data
+
+  native-demo:
+    image: songjiayang/native-histogram-demo:v0.1.0
+    ports:
+      - 18080:18080
+    command: 
+      - --native-factor=1.5
+      - --metrics-count=10
+      - --listen-address=:18080
+
+volumes:
+  data-prometheus:
