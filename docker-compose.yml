@@ -31,7 +31,7 @@ services:
       - 9090:9090
 
   grafana:
-    image: grafana/grafana:10.1.15
+    image: grafana/grafana:10.1.5
     pull_policy: always
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
@@ -44,20 +44,20 @@ services:
     ports:
       - 3000:3000
 
-  cortex:
-    image: yeya24/cortex:native-histogram-demo
-    hostname: cortex
-    depends_on:
-      - minio
-      - consul
-    command: ["-config.file=/cortex/config/cortex.yaml", "-server.http-listen-port=8080", "-server.grpc-listen-port=9080"]
-    ports:
-      - 8080:8080
-    volumes:
-      - ./config/cortex:/cortex/config
-      - ./data/data-cortex:/data
+  # cortex:
+  #   image: yeya24/cortex:native-histogram-demo
+  #   hostname: cortex
+  #   depends_on:
+  #     - minio
+  #     - consul
+  #   command: ["-config.file=/cortex/config/cortex.yaml", "-server.http-listen-port=8080", "-server.grpc-listen-port=9080"]
+  #   ports:
+  #     - 8080:8080
+  #   volumes:
+  #     - ./config/cortex:/cortex/config
+  #     - ./data/data-cortex:/data
 
-  native-demo:
+  native-histogram-demo:
     image: yeya24/native-histogram-app:demo
     ports:
       - 18080:18080
