@@ -58,7 +58,7 @@ services:
       - ./data/data-cortex:/data
 
   native-demo:
-    image: songjiayang/native-histogram-demo:v0.1.0
+    image: yeya24/native-histogram-app:demo
     ports:
       - 18080:18080
     command: 
