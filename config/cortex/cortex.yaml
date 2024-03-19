@@ -1,15 +1,14 @@
 target: all
 
-auth_enabled: false
-
 server:
-  grpc_server_max_send_msg_size: 536870912
+  http_listen_port: 8009
+  grpc_listen_port: 9009
+
+auth_enabled: false
 
 distributor:
   shard_by_all_labels: true
   zone_results_quorum_metadata: true
-  pool:
-    health_check_ingesters: true
 
 ingester_client:
   grpc_client_config:
@@ -25,16 +24,18 @@ ingester:
     final_sleep: 0s
     num_tokens: 512
     address: 127.0.0.1
-
+    min_ready_duration: 0s
     ring:
+      kvstore:
+        store: inmemory
       replication_factor: 1
 
 querier:
   query_ingesters_within: 3h
   # per_step_stats_enabled: true
   query_store_for_labels_enabled: true
-  ingester_streaming: true
   ingester_metadata_streaming: true
+  store_gateway_addresses: "http://localhost:9009"
 
 query_range:
   align_queries_with_step: true

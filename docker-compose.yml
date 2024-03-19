@@ -44,18 +44,18 @@ services:
     ports:
       - 3000:3000
 
-  # cortex:
-  #   image: yeya24/cortex:native-histogram-demo
-  #   hostname: cortex
-  #   depends_on:
-  #     - minio
-  #     - consul
-  #   command: ["-config.file=/cortex/config/cortex.yaml", "-server.http-listen-port=8080", "-server.grpc-listen-port=9080"]
-  #   ports:
-  #     - 8080:8080
-  #   volumes:
-  #     - ./config/cortex:/cortex/config
-  #     - ./data/data-cortex:/data
+  cortex:
+    image: yeya24/cortex:histogram-query-f8f1d66d0
+    hostname: cortex
+    depends_on:
+      - minio
+      - consul
+    command: ["-config.file=/cortex/config/cortex.yaml"]
+    ports:
+      - 8009:8009
+    volumes:
+      - ./config/cortex:/cortex/config
+      - ./data/data-cortex:/data
 
   native-histogram-demo:
     image: yeya24/native-histogram-app:demo

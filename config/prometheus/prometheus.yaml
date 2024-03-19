@@ -3,7 +3,7 @@ global:
   scrape_interval: 5s
 
 remote_write:
-  - url: http://cortex/api/v1/push
+  - url: http://cortex:8009/api/v1/push
     send_exemplars: false
     send_native_histograms: true
     #headers:
