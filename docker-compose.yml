@@ -21,12 +21,12 @@ services:
 
   prometheus:
     image: prom/prometheus:v2.50.1
-    command: ["--config.file=/etc/prometheus/prometheus.yaml",  "--enable-feature=native-histograms", "--enable-feature=expand-external-labels", "--enable-feature=agent"]
+    command: ["--config.file=/etc/prometheus/prometheus.yaml",  "--enable-feature=native-histograms", "--enable-feature=expand-external-labels"]
     environment:
       PODNAME: prometheus
     volumes:
       - ./config/prometheus:/etc/prometheus
-      - data-prometheus:/prometheus
+      - ./data/data-prometheus:/prometheus
     ports:
       - 9090:9090
 
@@ -45,7 +45,7 @@ services:
       - 3000:3000
 
   cortex:
-    image: yeya24/cortex:histogram-query-f8f1d66d0
+    image: yeya24/cortex:histogram-query-4ee141d7c
     hostname: cortex
     depends_on:
       - minio
